@@ -32,7 +32,7 @@ void sort(int length, key *objects) {
     key *big = objects;
     key *little;
     while(big<pivot) {
-        if(big->val < pivot->val) {
+        if(big->val > pivot->val) {
             little = big;
             little++;
             while(little<pivot && little->val > pivot->val) {
