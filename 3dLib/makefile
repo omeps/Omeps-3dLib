@@ -1,8 +1,7 @@
-exec : world.o 3dTest.o screenTools.o objectFiles.o
-	cc -o exec world.o 3dTest.o screenTools.o objectFiles.o
+3dlib.a : world.o screenTools.o objectFiles.o
+	ar cr 3dLib world.o screenTools.o objectFiles.o
 
 world.o : world.h
-3dTest.o : world.h
 screenTools.o : world.h
 objectFiles.o : world.h
 .PHONY : clean
