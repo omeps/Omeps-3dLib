@@ -1,4 +1,4 @@
-this is a simple 3d Graphics library made by @omeps as a side project. 
+Simple 3d graphics library
 
 Current features: 
 
@@ -6,8 +6,6 @@ Creating .bmp files
 creating textureless objects and adding them to a 'screen' (there isn't any z-culling yet and some bugs need fixing, so there are some errors)
 rotating and moving objects (no scaling yet)
 creating and reading file versions of objects
-
-It's currently under development by @omeps alone.
 
 HOW TO GET THE LIBRARY (mac):
 -First, read the code and make sure im not actually hacking your computer
