@@ -1,5 +1,5 @@
 3dlib.a : world.o screenTools.o objectFiles.o
-	ar cr 3dLib world.o screenTools.o objectFiles.o
+	ar cr 3dLib.a world.o screenTools.o objectFiles.o
 
 world.o : world.h
 screenTools.o : world.h
