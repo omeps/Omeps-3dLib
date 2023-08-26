@@ -19,7 +19,7 @@ HOW TO GET THE LIBRARY (mac):
 -add the header to your c files: Add '#include "3dLib/world.h"' to your project
 -Remember to include '3dLib/3dLib.a' when you compile
 
--For the example code, open terminal at the repositories' folder and run 'gcc example.c 3dLib/3dLib.a -o executable after running make to get the .exe file 
+-For the example code, open terminal at the repositories' folder and run 'gcc example.c 3dLib/3dLib.a -o executable' after running make to create the .exe file 
 
 how it runs:
 
