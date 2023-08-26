@@ -17,6 +17,7 @@ void swap(key *a, key *b) {
     *a = *b;
     *b = stored;    
 };
+
 void sort(int length, key *objects) {
     if(length == 0 || length == 1) {
         return;
@@ -53,6 +54,16 @@ void rotate(float *a, float *b, float theta) {
     float newa = (*a * cos(theta)) + (*b * sin(theta));
     *b = (*a * sin(theta)) - (*b * cos(theta));
     *a = newa;
+};
+void set(float (*v)[3],float newV[3]) {
+     (*v)[0] = newV[0];
+     (*v)[1] = newV[1];
+     (*v)[2] = newV[2];
+};
+void setT(unsigned char (*v)[3],unsigned char newV[3]) {
+     (*v)[0] = newV[0];
+     (*v)[1] = newV[1];
+     (*v)[2] = newV[2];
 };
 obj pack(instance object, ray camera) {
     obj packedObject;
