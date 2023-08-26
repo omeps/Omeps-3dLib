@@ -32,7 +32,7 @@ void sort(int length, key *objects) {
     key *big = objects;
     key *little;
     while(big<pivot) {
-        if(big->val > pivot->val) {
+        if(big->val < pivot->val) {
             little = big;
             little++;
             while(little<pivot && little->val > pivot->val) {
@@ -90,7 +90,7 @@ obj pack(instance object, ray camera) {
         rotate(&((*(packedV))[2]),&((*(packedV))[1]),object.position.rotation[1]);
         rotate(&((*(packedV))[0]),&((*(packedV))[2]),object.position.rotation[0]);
 
-        (*(packedV))[0] += object.position.pos[0] - camera.pos[0]; (*packedV)[1] += object.position.pos[1] - camera.pos[1]; (*packedV)[2] += object.position.pos[2] - camera.pos[2];
+        (*(packedV))[0] += object.position.pos[0] - camera.pos[0]; (*packedV)[1] += object.position.pos[1] - camera.pos[1]; (*packedV)[2] -= object.position.pos[2] - camera.pos[2];
 
         rotate(&((*(packedV))[0]), &((*(packedV))[2]), camera.rotation[0]);
         rotate(&((*(packedV))[2]), &((*(packedV))[1]), camera.rotation[1]);
