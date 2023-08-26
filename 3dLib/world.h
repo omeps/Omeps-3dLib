@@ -34,4 +34,7 @@ void render(scr s, char name[]);
 void clear(scr *screen);
 void makeFile(obj o, char *name);
 obj getFile(char *name);
+void set(float (*v)[3],float newV[3]);
+void setT(unsigned char (*v)[3],unsigned char newV[3]);
+
 #endif
