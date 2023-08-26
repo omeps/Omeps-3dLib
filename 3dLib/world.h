@@ -32,4 +32,6 @@ scr *makeScreen(int length, int width);
 void triangle(scr screen, int x[3], int y[3], unsigned char fillcolor[3], unsigned char border[3]);
 void render(scr s, char name[]);
 void clear(scr *screen);
+void makeFile(obj o, char *name);
+obj getFile(char *name);
 #endif
