@@ -10,7 +10,7 @@ creating and reading file versions of objects
 It's currently under development by @omeps alone.
 
 HOW TO GET THE LIBRARY (mac):
--First, read the code! You never know what might happen if you run someone you dont know's code without reading it.
+-First, read the code and make sure im not actually hacking your computer
 
 -Download the repository
 -Open terminal at the '3dLib' folder
