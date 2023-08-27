@@ -230,7 +230,7 @@ void triangle(scr screen, int x[3], int y[3], unsigned char fillcolor[3], unsign
         while((*(m.data + ((right + mi)>>3)) & (1<<(right+mi-(((right+mi)>>3)<<3)))) == 0) {
             right--;
         }
-        if(right > screen.length-max_x) right = screen.length - max_x;
+        if(right >= screen.length-min_x) right = screen.length - 1 - min_x;
         int j = left;
         while(j<=right) {
             if((*(m.data + ((j + mi)>>3)) & (1<<(j+mi-(((j+mi)>>3)<<3)))) == 0) {
