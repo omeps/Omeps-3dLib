@@ -118,8 +118,8 @@ void addObject(obj object, scr *screen) {
         int x[3];
         int y[3];
         for(int j = 0; j < 3; j++) {
-            x[j] = (int)(1000 * (*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[0]/(*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[2])+(screen->length>>1);
-            y[j] = (int)(1000 * (*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[1]/(*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[2])+(screen->width>>1);
+            x[j] = (int)(screen->length * (*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[0]/(*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[2])+(screen->length>>1);
+            y[j] = (int)(screen->width * (*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[1]/(*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[2])+(screen->width>>1);
         }
         unsigned char fill[3] = {122,122,122};
         unsigned char border[3] = {255,255,255};
