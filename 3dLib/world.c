@@ -112,6 +112,8 @@ void addObject(obj object, scr *screen) {
         (keys+i)->val = min((*(object.verts+((*(object.triangles+i))[0])))[2],(*(object.verts+((*(object.triangles+i))[1])))[2],(*(object.verts+((*(object.triangles+i))[2])))[2]);
     }
     sort(object.amtOfTriangles, keys);
+    int start = 0;
+    while(start < object.amtOfTriangles && (keys+start)->val < 0) start++; 
     for(int i = 0; i < object.amtOfTriangles; i++) {
         int x[3];
         int y[3];
@@ -151,7 +153,9 @@ void addToScreen(int amtOfObjects, instance *instances, ray camera, scr *screen)
     }
     /* print objects */
     key *k = keyList;
-    for(int i = 0; i < amtOfObjects; i++) {
+    int start = 0;
+    while(start < amtOfObjects && (k++)->val < 0) start++;
+    for(int i = start; i < amtOfObjects; i++) {
 
         addObject(*(objList+(k++)->index),screen);
     }
