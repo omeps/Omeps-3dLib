@@ -11,10 +11,15 @@ HOW TO GET THE LIBRARY (mac):
 -First, read the code and make sure im not actually hacking your computer
 
 -Download the repository
+
 -Open terminal at the '3dLib' folder
+
 -Run 'make'
+
 -Move the inner '3dLib' folder to your project
+
 -add the header to your c files: Add '#include "3dLib/world.h"' to your project
+
 -Remember to include '3dLib/3dLib.a' when you compile
 
 -For the example code, open terminal at the repositories' folder and run 'gcc example.c 3dLib/3dLib.a -o executable' after running make to create the .exe file 
