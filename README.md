@@ -3,8 +3,11 @@ Simple 3d graphics library
 Current features: 
 
 Creating .bmp files
+
 creating textureless objects and adding them to a 'screen' (there isn't any z-culling yet and some bugs need fixing, so there are some errors)
+
 rotating and moving objects (no scaling yet)
+
 creating and reading file versions of objects
 
 HOW TO GET THE LIBRARY (mac):
