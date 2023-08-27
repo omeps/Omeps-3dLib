@@ -38,11 +38,11 @@ int main() {
     instances[0].position.pos[0] = 0.0f;
     instances[0].position.pos[1] = 0.0f;
     instances[0].position.pos[2] = 20.0f;
-    instances[0].position.rotation[0] = 1.570796f;
+    instances[0].position.rotation[0] = 0;
     instances[0].position.rotation[1] = 0;
     instances[0].position.rotation[2] = 0;
     instances[1].object = &o;
-    instances[1].position.pos[0] = 10.0f;
+    instances[1].position.pos[0] = 3.0f;
     instances[1].position.pos[1] = 0.0f;
     instances[1].position.pos[2] = 20.0f;
     instances[1].position.rotation[0] = 0;
