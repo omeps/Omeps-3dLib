@@ -36,5 +36,6 @@ void makeFile(obj o, char *name);
 obj getFile(char *name);
 void set(float (*v)[3],float newV[3]);
 void setT(unsigned char (*v)[3],unsigned char newV[3]);
+void zDrawTriangle(zMask m, scr *screen, int x[3], int y[3], float z[3], unsigned char fillcolor[3], unsigned char border[3]);
 
 #endif
