@@ -100,11 +100,6 @@ typedef struct mask {
     int width;
     unsigned char *data;
 } mask;
-typedef struct zMask {
-    int length;
-    int width;
-    float *distances;
-} zMask;
 scr *makeScreen(int length, int width) {
     scr *ret = (scr *)malloc(sizeof(scr));
     ret->length = length;
