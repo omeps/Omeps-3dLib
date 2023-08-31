@@ -1,6 +1,7 @@
 #include "world.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 void render(scr s, char name[]) {
     printf("hello!\n");
     int chars = 3*s.length*s.width + 54;
@@ -121,9 +122,6 @@ mask Mask(int length, int width) {
     m.length = length;
     m.width = width;
     m.data = (unsigned char *)malloc(sizeof(char)*length*width);
-    for(int i = 0; i < length*width; i++) {
-        *(m.distances+i) = INFINITY;
-    }
     return m;
 };
 zMask ZMask(int length, int width) {
@@ -131,7 +129,9 @@ zMask ZMask(int length, int width) {
     m.length = length;
     m.width = width;
     m.distances = (float *)malloc(sizeof(float)*length*width);
-    
+    for(int i = 0; i < length*width; i++) {
+        *(m.distances+i) = INFINITY;
+    }
     return m;
 };
 void dot(mask m, int index) {
