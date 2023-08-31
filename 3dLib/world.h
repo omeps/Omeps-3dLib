@@ -1,5 +1,10 @@
 #ifndef WORLD_H_
 #define WORLD_H_
+typedef struct zMask {
+    int length;
+    int width;
+    float *distances;
+} zMask;
 struct ray;
 typedef struct ray {
     float pos[3];
