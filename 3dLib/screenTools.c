@@ -1,6 +1,7 @@
 #include "world.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 void render(scr s, char name[]) {
     printf("hello!\n");
     int chars = 3*s.length*s.width + 54;
@@ -99,11 +100,6 @@ typedef struct mask {
     int width;
     unsigned char *data;
 } mask;
-typedef struct zMask {
-    int length;
-    int width;
-    float *distances;
-} zMask;
 scr *makeScreen(int length, int width) {
     scr *ret = (scr *)malloc(sizeof(scr));
     ret->length = length;
@@ -128,6 +124,9 @@ zMask ZMask(int length, int width) {
     m.length = length;
     m.width = width;
     m.distances = (float *)malloc(sizeof(float)*length*width);
+    for(int i = 0; i < length*width; i++) {
+        *(m.distances+i) = INFINITY;
+    }
     return m;
 };
 void dot(mask m, int index) {
@@ -226,11 +225,11 @@ void triangle(scr screen, int x[3], int y[3], unsigned char fillcolor[3], unsign
         while((*(m.data + ((left + mi)>>3)) & (1<<(left+mi-(((left+mi)>>3)<<3)))) == 0) {
             left++;
         }
-        if(left < 0) left = -min_x;
+        if(left < -min_x) left = -min_x;
         while((*(m.data + ((right + mi)>>3)) & (1<<(right+mi-(((right+mi)>>3)<<3)))) == 0) {
             right--;
         }
-        if(right >= screen.length) right = screen.length - max_x;
+        if(right >= screen.length-min_x) right = screen.length - 1 - min_x;
         int j = left;
         while(j<=right) {
             if((*(m.data + ((j + mi)>>3)) & (1<<(j+mi-(((j+mi)>>3)<<3)))) == 0) {
@@ -249,11 +248,15 @@ void triangle(scr screen, int x[3], int y[3], unsigned char fillcolor[3], unsign
         mi += m.length;
     }
 };
-/*
-
+void xdotUp(zMask m, int x1, float z1, int x2, float z2, int x, int y) {
+    zDot(m,x,y,z1 + (z2 - z1) * (x - x1) / (x2 - x1));
+};
+void ydotUp(zMask m, int y1, float z1, int y2, float z2, int x, int y) {
+    zDot(m,x,y,z1 + (z2 - z1) * (y - y1) / (y2 - y1));
+};
 void drawLineToZMask(zMask m, int x1, int x2, int y1, int y2, float d1, float d2) {
     if(x1>x2) {
-        drawLine(m, x2, x1, y2, y1,d2,d1);
+        drawLineToZMask(m, x2, x1, y2, y1,d2,d1);
         return;
     };
     int dx = (x2-x1)<<1;
@@ -265,7 +268,7 @@ void drawLineToZMask(zMask m, int x1, int x2, int y1, int y2, float d1, float d2
         int y = y1;
         for(int x = x1; x <= x2; x++) {
             if(0<=x & m.length>x & 0<=y & m.width>y) {
-            zDot();
+                xdotUp(m,x1,d1,x2,d2,x,y);
             }
             error += dy;
             if(error >=0) {
@@ -276,9 +279,10 @@ void drawLineToZMask(zMask m, int x1, int x2, int y1, int y2, float d1, float d2
         } else {
         int error = dx-dy;
         int x = x1;
+        int div = y2-y1;
         for(int y = y1; y >= y2; y--) {
             if(0<=x & m.length>x & 0<=y & m.width>y) {
-            dot(m,x+m.length*y);printf("%d,%d\n",x,y);
+                ydotUp(m, y1, d1, y2, d2, x, y);
             }
             error += dx;
             if(error >= 0) {
@@ -293,7 +297,7 @@ void drawLineToZMask(zMask m, int x1, int x2, int y1, int y2, float d1, float d2
         int y = y1;
         for(int x = x1; x <= x2; x++) {
             if(0<=x & m.length>x & 0<=y & m.width>y) {
-            dot(m,x+m.length*y);printf("%d,%d\n",x,y);
+                xdotUp(m,x1,d1,x2,d2,x,y);
             }
             error += dy;
             if(error >=0) {
@@ -306,7 +310,7 @@ void drawLineToZMask(zMask m, int x1, int x2, int y1, int y2, float d1, float d2
         int x = x1;
         for(int y = y1; y <= y2; y++) {
             if(0<=x & m.length>x & 0<=y & m.width>y) {
-            dot(m,x+m.length*y);printf("%d,%d\n",x,y);
+                ydotUp(m, y1, d1, y2, d2, x, y);
             }
             error += dx;
             if(error >= 0) {
@@ -316,4 +320,54 @@ void drawLineToZMask(zMask m, int x1, int x2, int y1, int y2, float d1, float d2
         }
     }
 };
-*/
+void zDrawTriangle(zMask m, scr *screen, int x[3], int y[3], float z[3], unsigned char fillcolor[3], unsigned char border[3]) {
+    printf("\n");
+    int min_x = x[0];
+    int max_x = x[0];
+    if(x[1]>x[0]) max_x = x[1]; else min_x = x[1];
+    if(x[2]<min_x) min_x = x[2]; else if(x[2]>max_x) max_x = x[2];
+    int min_y = y[0];
+    int max_y = y[0];
+    if(y[1]>y[0]) max_y = y[1]; else min_y = y[1];
+    if(y[2]<min_y) min_y = y[2]; else if(y[2]>max_y) max_y = y[2];
+    zMask temp = ZMask(max_x-min_x+1,max_y-min_y+1);
+    drawLineToZMask(temp,x[0]-min_x,x[1]-min_x,y[0]-min_y,y[1]-min_y,z[0],z[1]);
+    drawLineToZMask(temp,x[1]-min_x,x[2]-min_x,y[1]-min_y,y[2]-min_y,z[1],z[2]);
+    drawLineToZMask(temp,x[0]-min_x,x[2]-min_x,y[0]-min_y,y[2]-min_y,z[0],z[2]);
+    printf("%f, %f, %f\n", z[0], z[1], z[2]);
+    int i = 0;
+    if(min_y < 0) i = -min_y;
+    int iMask = i * temp.length;
+    int iScreen = (i + min_y) * screen->length;
+    while(i <= max_y-min_y) {
+        int left = 0;
+        int right = max_x-min_x;
+        while(*(temp.distances+iMask+left) == INFINITY) left++;
+        while(*(temp.distances+iMask+right) == INFINITY) right--;
+        int j;
+        if(left > -min_x) j = left; else j = -min_x;
+        float z1 = *(temp.distances+iMask+left);
+        float z2 = *(temp.distances+iMask+right);
+        printf("%f, %f\n", z1, z2);
+        int dist = right - left;
+        while(j <= right  && j < screen->length-min_x) {
+            float val = z1 + (z2 - z1) * (j - left) / (right - left);
+            if(val <= *(m.distances + iMask + j + min_x)) {
+                *(m.distances + iMask + j + min_x) = val;
+                if(*(temp.distances+iMask+j) == INFINITY) {
+                    *(screen->data+3*(j+min_x+iScreen)) = fillcolor[0];
+                    *(screen->data+3*(j+min_x+iScreen)+1) = fillcolor[1];
+                    *(screen->data+3*(j+min_x+iScreen)+2) = fillcolor[2];
+                } else {
+                    *(screen->data+3*(j+min_x+iScreen)) = border[0];
+                    *(screen->data+3*(j+min_x+iScreen)+1) = border[1];
+                    *(screen->data+3*(j+min_x+iScreen)+2) = border[2];
+                }
+            }
+            j++;
+        }
+        i++;
+        iMask += temp.length;
+        iScreen += screen->length;
+    }
+};
