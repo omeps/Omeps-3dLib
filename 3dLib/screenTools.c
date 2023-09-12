@@ -249,10 +249,10 @@ void triangle(scr screen, int x[3], int y[3], unsigned char fillcolor[3], unsign
     }
 };
 void xdotUp(zMask m, int x1, float z1, int x2, float z2, int x, int y) {
-    zDot(m,x,y,(x1-z1*x)/((z2-z1)*x-(x2-x1)));
+    zDot(m,x,y,z1 + (z2 - z1) * (x - x1) / (x2 - x1));
 };
 void ydotUp(zMask m, int y1, float z1, int y2, float z2, int x, int y) {
-    zDot(m,x,y,(y1-z1*x)/((y2-z1)*x-(y2-y1)));
+    zDot(m,x,y,z1 + (z2 - z1) * (y - y1) / (y2 - y1));
 };
 void drawLineToZMask(zMask m, int x1, int x2, int y1, int y2, float d1, float d2) {
     if(x1>x2) {
@@ -321,6 +321,7 @@ void drawLineToZMask(zMask m, int x1, int x2, int y1, int y2, float d1, float d2
     }
 };
 void zDrawTriangle(zMask m, scr *screen, int x[3], int y[3], float z[3], unsigned char fillcolor[3], unsigned char border[3]) {
+    printf("\n");
     int min_x = x[0];
     int max_x = x[0];
     if(x[1]>x[0]) max_x = x[1]; else min_x = x[1];
@@ -333,10 +334,11 @@ void zDrawTriangle(zMask m, scr *screen, int x[3], int y[3], float z[3], unsigne
     drawLineToZMask(temp,x[0]-min_x,x[1]-min_x,y[0]-min_y,y[1]-min_y,z[0],z[1]);
     drawLineToZMask(temp,x[1]-min_x,x[2]-min_x,y[1]-min_y,y[2]-min_y,z[1],z[2]);
     drawLineToZMask(temp,x[0]-min_x,x[2]-min_x,y[0]-min_y,y[2]-min_y,z[0],z[2]);
+    printf("%f, %f, %f\n", z[0], z[1], z[2]);
     int i = 0;
     if(min_y < 0) i = -min_y;
     int iMask = i * temp.length;
-    int iScreen = i * screen->length;
+    int iScreen = (i + min_y) * screen->length;
     while(i <= max_y-min_y) {
         int left = 0;
         int right = max_x-min_x;
@@ -346,11 +348,12 @@ void zDrawTriangle(zMask m, scr *screen, int x[3], int y[3], float z[3], unsigne
         if(left > -min_x) j = left; else j = -min_x;
         float z1 = *(temp.distances+iMask+left);
         float z2 = *(temp.distances+iMask+right);
+        printf("%f, %f\n", z1, z2);
         int dist = right - left;
         while(j <= right  && j < screen->length-min_x) {
-            float val = (left-z1*j)/((z2-z1)*j-(right - left));
-            if(val<*(m.distances + iScreen + j + min_x)) {
-                *(m.distances + iScreen + j + min_x) = val;
+            float val = z1 + (z2 - z1) * (j - left) / (right - left);
+            if(val <= *(m.distances + iMask + j + min_x)) {
+                *(m.distances + iMask + j + min_x) = val;
                 if(*(temp.distances+iMask+j) == INFINITY) {
                     *(screen->data+3*(j+min_x+iScreen)) = fillcolor[0];
                     *(screen->data+3*(j+min_x+iScreen)+1) = fillcolor[1];
