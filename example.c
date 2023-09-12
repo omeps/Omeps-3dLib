@@ -33,6 +33,8 @@ int main() {
 
     setT(t++,(unsigned char[3]){1,3,5});
     setT(t++,(unsigned char[3]){3,5,7});
+    o.border[0] = 255; o.border[1] = 255; o.border[2] = 255; 
+    o.fill[0] = 122; o.fill[1] = 122; o.fill[2] = 122; 
     instance instances[2];
     instances[0].object = &o;
     instances[0].position.pos[0] = 0.0f;
@@ -55,5 +57,4 @@ int main() {
     addToScreen(2,instances,camera,screen);
     render(*screen,"render.bmp");
     makeFile(o,"cube");
-    
 };
