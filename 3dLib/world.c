@@ -135,8 +135,8 @@ void addObject(obj object, scr *screen) {
             int y[3];
             float z[3];
             for(int j = 0; j < 3; j++) {
-                x[j] = (int)(1000 * (*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[0]/(*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[2])+(screen->length>>1);
-                y[j] = (int)(1000 * (*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[1]/(*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[2])+(screen->width>>1);
+                x[j] = (int)((screen->length>>2) * (*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[0]/(*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[2])+(screen->length>>1);
+                y[j] = (int)((screen->width>>2) * (*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[1]/(*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[2])+(screen->width>>1);
                 z[j] = (*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[2];
             }
             unsigned char fill[3];
@@ -151,8 +151,8 @@ void addObject(obj object, scr *screen) {
             int x[3];
             int y[3];
             for(int j = 0; j < 3; j++) {
-                x[j] = (int)(1000 * (*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[0]/(*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[2])+(screen->length>>1);
-                y[j] = (int)(1000 * (*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[1]/(*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[2])+(screen->width>>1);
+                x[j] = (int)((screen->length>>2) * (*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[0]/(*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[2])+(screen->length>>1);
+                y[j] = (int)((screen->width>>2) * (*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[1]/(*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[2])+(screen->width>>1);
             }
             unsigned char fill[3];
             unsigned char border[3];
@@ -164,6 +164,40 @@ void addObject(obj object, scr *screen) {
             triangle(*screen, x, y,fill,border);
         }
     }
+    int i = object.amtOfTriangles - 1;
+    if(zCull[i-1]) {
+            int x[3];
+            int y[3];
+            float z[3];
+            for(int j = 0; j < 3; j++) {
+                x[j] = (int)((screen->length>>2) * (*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[0]/(*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[2])+(screen->length>>1);
+                y[j] = (int)((screen->width>>2) * (*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[1]/(*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[2])+(screen->width>>1);
+                z[j] = (*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[2];
+            }
+            unsigned char fill[3];
+            unsigned char border[3];
+            
+            for(int j = 0; j < 3; j++) {
+                fill[j] = object.fill[j];
+                border[j] = object.border[j];
+            }
+            zDrawTriangle(cullMask, screen, x, y, z, fill,border);
+        } else {
+            int x[3];
+            int y[3];
+            for(int j = 0; j < 3; j++) {
+                x[j] = (int)((screen->length>>2) * (*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[0]/(*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[2])+(screen->length>>1);
+                y[j] = (int)((screen->width>>2) * (*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[1]/(*(object.verts+((*(object.triangles+((keys+i)->index)))[j])))[2])+(screen->width>>1);
+            }
+            unsigned char fill[3];
+            unsigned char border[3];
+            
+            for(int j = 0; j < 3; j++) {
+                fill[j] = object.fill[j];
+                border[j] = object.border[j];
+            }
+            triangle(*screen, x, y,fill,border);
+        }
     free(keys); free(maxList); free(cullMask.distances);
 };
 void addToScreen(int amtOfObjects, instance *instances, ray camera, scr *screen) {
