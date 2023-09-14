@@ -116,14 +116,12 @@ void addObject(obj object, scr *screen) {
         (keys+i)->index = i;
         (keys+i)->val = min((*(object.verts+((*(object.triangles+i))[0])))[2],(*(object.verts+((*(object.triangles+i))[1])))[2],(*(object.verts+((*(object.triangles+i))[2])))[2]);
         *(maxList+i) = max((*(object.verts+((*(object.triangles+i))[0])))[2],(*(object.verts+((*(object.triangles+i))[1])))[2],(*(object.verts+((*(object.triangles+i))[2])))[2]);
-        printf("min: %f, max: %f\n", (keys+i)->val, *(maxList+i));
     }
     sort(object.amtOfTriangles, keys);
     float currentMaxValue = *(maxList + (keys + object.amtOfTriangles - 1)->index);
     bool zCull[object.amtOfTriangles - 1]; 
     for(int i = object.amtOfTriangles - 2; i >= 0; i--) {
         zCull[i] = currentMaxValue > (keys + i)->val;
-        printf("%d, %f, %f\n", zCull[i], currentMaxValue, (keys + i)->val);
         if(currentMaxValue < *(maxList + (keys + i)->index)) {
             currentMaxValue = *(maxList + (keys + i)->index);
         }
