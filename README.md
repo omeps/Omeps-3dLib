@@ -33,4 +33,4 @@ This library uses objects, rays, and instances.
 An object stores vertices and triangles, a ray stores a position and rotation, and an instance stores a ray and a reference to an object.
 you can add instances to the screen using addToScreen(), which first converts the instances to objects based on a camera ray, then sorts them, and adds them to the screen.
 
-You should use instances for all of your actual coding and only use objects when you create them and create instances of them because objects are difficult to work with. They're much harder to move and rotate.
+You should use instances for all of your drawing because objects are difficult to work with. They're much harder to move and rotate, so they're only good for storing information.
