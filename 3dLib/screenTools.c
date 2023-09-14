@@ -335,7 +335,7 @@ void zDrawTriangle(zMask m, scr *screen, int x[3], int y[3], float z[3], unsigne
     int i = 0;
     if(min_y < 0) i = -min_y;
     int iTemp = i * temp.length;
-    int iMask = i * m.length;
+    int iMask = (i + min_y) * m.length;
     int iScreen = (i + min_y) * screen->length;
     while(i <= max_y-min_y) {
         int left = 0;
