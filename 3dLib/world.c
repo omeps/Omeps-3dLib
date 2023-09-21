@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <math.h>
 #include "world.h"
+#define LUMINOSITY 0.3
 typedef struct sortingkey {
     int index;
     float val;
@@ -11,6 +12,9 @@ float max(float a, float b, float c) {
     float s;
     if(b > a) s = b; else s = a;
     if(c > s) return c; else return s;
+};
+float max2(float a, float b) {
+    if(a > b) return a; else return b;
 };
 float min(float a, float b, float c) {
     float s;
@@ -52,7 +56,6 @@ void sort(int length, key *objects) {
     sort(pivot-objects,objects);
     sort(length-(pivot-objects)-1, (pivot+1));
 
-
 };
 void rotate(float *a, float *b, float theta) {
     float newa = (*a * cos(theta)) + (*b * sin(theta));
@@ -69,6 +72,7 @@ void setT(unsigned char (*v)[3],unsigned char newV[3]) {
      (*v)[1] = newV[1];
      (*v)[2] = newV[2];
 };
+
 obj pack(instance object, ray camera) {
     obj packedObject;
 
@@ -112,10 +116,30 @@ void freeUp(obj o) {
 void addObject(obj object, scr *screen) {
     key *keys = (key *)malloc(sizeof(key)*object.amtOfTriangles);
     float *maxList = (float *)malloc(sizeof(float)*object.amtOfTriangles);
+    float (*normals)[3] =  (float (*)[3])calloc(object.amtOfVerts, sizeof(float[3]));
     for(int i = 0; i < object.amtOfTriangles; i++) {
         (keys+i)->index = i;
         (keys+i)->val = min((*(object.verts+((*(object.triangles+i))[0])))[2],(*(object.verts+((*(object.triangles+i))[1])))[2],(*(object.verts+((*(object.triangles+i))[2])))[2]);
         *(maxList+i) = max((*(object.verts+((*(object.triangles+i))[0])))[2],(*(object.verts+((*(object.triangles+i))[1])))[2],(*(object.verts+((*(object.triangles+i))[2])))[2]);
+        float a[3];
+        float b[3];
+        for(int j = 0; j < 3; j++) {
+            a[j] = (*(object.verts+((*(object.triangles+i))[2])))[j] - (*(object.verts+((*(object.triangles+i))[1])))[j];
+            b[j] = (*(object.verts+((*(object.triangles+i))[2])))[j] - (*(object.verts+((*(object.triangles+i))[0])))[j];
+        }
+        float normal[3];
+        normal[0] = a[1] * b[2] - a[2] * b[1];
+        normal[1] = a[2] * b[0] - a[0] * b[2];
+        normal[2] = a[0] * b[1] - a[1] * b[0];
+        for(int j = 0; j < 3; j++) {
+            for(int k = 0; k < 3; k++) {
+                (*(normals + (*(object.triangles+i))[j]))[k] += normal[k];
+            }
+        }
+
+    }
+    for(int i = 0; i < object.amtOfVerts; i++) {
+        printf("%f\n",(*(normals+i))[1]);
     }
     sort(object.amtOfTriangles, keys);
     float currentMaxValue = *(maxList + (keys + object.amtOfTriangles - 1)->index);
@@ -128,6 +152,12 @@ void addObject(obj object, scr *screen) {
     }
     zMask cullMask = ZMask(screen->length, screen->width);
     for(int i = 0; i < object.amtOfTriangles - 1; i++) {
+        #define valOfTri(i_,vertice, component) (*(object.verts+((*(object.triangles+(keys+i_)->index))[vertice])))[component]
+        #define getVec(index,n,v) (valOfTri(index,0,v) - valOfTri(index,n,v))
+        float normal[3];
+        normal[0] = getVec(i,1,1) * getVec(i,2,2) - getVec(i,1,2) * getVec(i,2,1);
+        normal[1] = getVec(i,1,2) * getVec(i,2,0) - getVec(i,1,0) * getVec(i,2,2);
+        normal[2] = getVec(i,1,0) * getVec(i,2,1) - getVec(i,1,1) * getVec(i,2,0);
         if(zCull[i] || (i != 0 && zCull[i-1])) {
             int x[3];
             int y[3];
@@ -139,10 +169,13 @@ void addObject(obj object, scr *screen) {
             }
             unsigned char fill[3];
             unsigned char border[3];
-            
+            #define getSquare(_index, vert, k) pow((*(normals + *(object.triangles+((keys+_index)->index))[vert]))[k],2)
+            #define magnitude(index,vert) sqrt(getSquare(index,vert,0)+getSquare(index,vert,1)+getSquare(index,vert,2))
+            float dotProd = max2(0,(*(normals + (*(object.triangles+((keys+i)->index)))[0]))[1] / magnitude(i,0) + (*(normals + (*(object.triangles+((keys+i)->index)))[1]))[1] / magnitude(i,1) + (*(normals + (*(object.triangles+((keys+i)->index)))[2]))[1] / magnitude(i,2));
+            dotProd /= 3;
             for(int j = 0; j < 3; j++) {
-                fill[j] = object.fill[j];
-                border[j] = object.border[j];
+                fill[j] = (unsigned char) (object.fill[j]) * (dotProd*(1-LUMINOSITY) + LUMINOSITY);
+                border[j] = (unsigned char) (object.border[j]) * (dotProd*(1-LUMINOSITY) + LUMINOSITY);
             }
             zDrawTriangle(cullMask, screen, x, y, z, fill,border);
         } else {
@@ -154,15 +187,24 @@ void addObject(obj object, scr *screen) {
             }
             unsigned char fill[3];
             unsigned char border[3];
-            
+            #define getSquare(_index, vert, k) pow((*(normals + *(object.triangles+((keys+_index)->index))[vert]))[k],2)
+            #define magnitude(index,vert) sqrt(getSquare(index,vert,0)+getSquare(index,vert,1)+getSquare(index,vert,2))
+            float dotProd = max2(0,(*(normals + (*(object.triangles+((keys+i)->index)))[0]))[1] / magnitude(i,0) + (*(normals + (*(object.triangles+((keys+i)->index)))[1]))[1] / magnitude(i,1) + (*(normals + (*(object.triangles+((keys+i)->index)))[2]))[1] / magnitude(i,2));
+            dotProd /= 3;
             for(int j = 0; j < 3; j++) {
-                fill[j] = object.fill[j];
-                border[j] = object.border[j];
+                fill[j] = (unsigned char) (object.fill[j]) * (dotProd*(1-LUMINOSITY) + LUMINOSITY);
+                border[j] = (unsigned char) (object.border[j]) * (dotProd*(1-LUMINOSITY) + LUMINOSITY);
             }
             triangle(*screen, x, y,fill,border);
         }
     }
     int i = object.amtOfTriangles - 1;
+    #define valOfTri(i_,vertice, component) (*(object.verts+((*(object.triangles+(keys+i_)->index))[vertice])))[component]
+    #define getVec(index,n,v) (valOfTri(index,0,v) - valOfTri(index,n,v))
+    float normal[3];
+    normal[0] = getVec(i,1,1) * getVec(i,2,2) - getVec(i,1,2) * getVec(i,2,1);
+    normal[1] = getVec(i,1,2) * getVec(i,2,0) - getVec(i,1,0) * getVec(i,2,2);
+    normal[2] = getVec(i,1,0) * getVec(i,2,1) - getVec(i,1,1) * getVec(i,2,0);
     if(zCull[i-1]) {
             int x[3];
             int y[3];
@@ -174,10 +216,13 @@ void addObject(obj object, scr *screen) {
             }
             unsigned char fill[3];
             unsigned char border[3];
-            
+            #define getSquare(_index, vert, k) pow((*(normals + *(object.triangles+((keys+_index)->index))[vert]))[k],2)
+            #define magnitude(index,vert) sqrt(getSquare(index,vert,0)+getSquare(index,vert,1)+getSquare(index,vert,2))
+            float dotProd = max2((*(normals + (*(object.triangles+((keys+i)->index)))[0]))[1] / magnitude(i,0) + (*(normals + (*(object.triangles+((keys+i)->index)))[1]))[1] / magnitude(i,1) + (*(normals + (*(object.triangles+((keys+i)->index)))[2]))[1] / magnitude(i,2),0);
+            dotProd /= 3;
             for(int j = 0; j < 3; j++) {
-                fill[j] = object.fill[j];
-                border[j] = object.border[j];
+                fill[j] = (unsigned char) (object.fill[j]) * (dotProd*(1-LUMINOSITY) + LUMINOSITY);
+                border[j] = (unsigned char) (object.border[j]) * (dotProd*(1-LUMINOSITY) + LUMINOSITY);
             }
             zDrawTriangle(cullMask, screen, x, y, z, fill,border);
         } else {
@@ -189,10 +234,13 @@ void addObject(obj object, scr *screen) {
             }
             unsigned char fill[3];
             unsigned char border[3];
-            
+            #define getSquare(_index, vert, k) pow((*(normals + *(object.triangles+((keys+_index)->index))[vert]))[k],2)
+            #define magnitude(index,vert) sqrt(getSquare(index,vert,0)+getSquare(index,vert,1)+getSquare(index,vert,2))
+            float dotProd = max2(0,(*(normals + (*(object.triangles+((keys+i)->index)))[0]))[1] / magnitude(i,0) + (*(normals + (*(object.triangles+((keys+i)->index)))[1]))[1] / magnitude(i,1) + (*(normals + (*(object.triangles+((keys+i)->index)))[2]))[1] / magnitude(i,2));
+            dotProd /= 3;
             for(int j = 0; j < 3; j++) {
-                fill[j] = object.fill[j];
-                border[j] = object.border[j];
+                fill[j] = (unsigned char) (object.fill[j]) * (dotProd*(1-LUMINOSITY) + LUMINOSITY);
+                border[j] = (unsigned char) (object.border[j]) * (dotProd*(1-LUMINOSITY) + LUMINOSITY);
             }
             triangle(*screen, x, y,fill,border);
         }
