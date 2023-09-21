@@ -65,28 +65,39 @@ int main() {
         in[2] = (i+1)%10 + 1;
         setT(t++, in);
     } 
-    for(int i = 0; i < 7; i++) {
+    for(int i = 0; i < 4; i++) {
         for(int j = 0; j < 10; j++) {
             unsigned char  in[3];
             in[0] = i*10 + j + 1;
-            in[1] = (i+1)*10 + j + 1;
-            in[2] = (i+1)*10 + (j+1)%10 + 1;
-            setT(t++, in);
+            in[2] = (i+1)*10 + j + 1;
             in[1] = (i)*10 + (j+1)%10 + 1;
+            setT(t++, in);
+            in[0] = (i+1)*10 + (j+1)%10 + 1;
             setT(t++, in);
         }
     } 
+    for(int i = 4; i < 7; i++) {
+        for(int j = 0; j < 10; j++) {
+            unsigned char  in[3];
+            in[1] = i*10 + j + 1;
+            in[2] = (i+1)*10 + j + 1;
+            in[0] = (i)*10 + (j+1)%10 + 1;
+            setT(t++, in);
+            in[1] = (i+1)*10 + (j+1)%10 + 1;
+            setT(t++, in);
+        }
+    }
     for(int i = 0; i < 10; i++) {
         unsigned char  in[3];
-        in[0] = 81;
-        in[1] = 70 + i + 1;
+        in[1] = 81;
+        in[0] = 70 + i + 1;
         in[2] = 70 + (i+1)%10 + 1;
         setT(t++, in);
     } 
     circle.border[0] = 255; circle.border[1] = 255; circle.border[2] = 255; 
-    circle.fill[0] = 122; circle.fill[1] = 122; circle.fill[2] = 122; 
+    circle.fill[0] = 255; circle.fill[1] = 255; circle.fill[2] = 255; 
     instance instances[3];
-    instances[0].object = &o;
+    instances[0].object = &circle;
     instances[0].position.pos[0] = 0.0f;
     instances[0].position.pos[1] = 0.0f;
     instances[0].position.pos[2] = 5.0f;
